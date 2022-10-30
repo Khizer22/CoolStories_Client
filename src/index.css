@@ -1,0 +1,17 @@
+body {
+  margin: 0;
+
+}
+
+html,body{
+  /* width: 100vw; */
+  /* min-height: 100vh; */
+  background: linear-gradient(45deg, #d6d6df, #d8d8f1);
+  /* background: linear-gradient(45deg, rgb(170, 163, 185), rgb(173, 173, 209)); */
+  /* line-height:normal !important; */
+} 
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
