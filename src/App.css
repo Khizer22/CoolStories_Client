@@ -16,7 +16,7 @@
 
 .feedback-message {
   color: red !important;
-  font-weight: bold;
+  /* font-weight: bold; */
   font-size:medium !important ; 
 }
 
@@ -28,6 +28,17 @@
 
 .flash {
   animation: blinker 2s linear;
+}
+
+.padd {
+  padding-top: 106px;
+  padding-bottom: 50px;
+}
+
+.add-story-button {
+  /* display:flex;
+  justify-content: center; */
+  margin-bottom: 20px;
 }
 
 /* .App-logo {

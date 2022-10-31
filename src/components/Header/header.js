@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import './header.css';
 
-function Header({onRouteChange}) {
+function Header({onRouteChange,signedInUser,logOut}) {
 
     return (
       <>
@@ -23,10 +23,17 @@ function Header({onRouteChange}) {
                 <Button variant="outline-success">Search</Button>
             </Form>
 
+            {signedInUser === 0 ? 
             <Nav>
                 <Nav.Link href="#SignIn" onClick={() => onRouteChange('sign-in')}>Sign In</Nav.Link>
                 <Nav.Link href="#Register" onClick={() => onRouteChange('register')}>Register</Nav.Link>
             </Nav>
+            : 
+            <Nav>
+                <Nav.Link href="#SignIn" onClick={logOut}>Log Out</Nav.Link>
+            </Nav>
+            }
+            
 
           </Container>
         </Navbar>

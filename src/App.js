@@ -8,14 +8,20 @@ import Header from './components/Header/header';
 import Footer from './components/Footer/footer';
 import Storylist from './components/Story/StoryList/storyList';
 import StoryReading from './components/Story/StoryReading/storyReading';
+import AddStory from './components/Story/AddStory/addStory';
 import 'bootstrap/dist/css/bootstrap.css';
 import Container from 'react-bootstrap/Container';
+import Button from 'react-bootstrap/Button';
 
 const initialState = {
   route: 'home',
+  signedInUser: 0, //0 means not signed in
+  storyInfoArray: [],
+  storyID: 0,
   storyImage: 'Story Image URL',
   storyTitle: 'Story Title',
-  storyText: 'Story Text'
+  storyText: 'Story Text',
+  loadingMessage: "Loading..."
 }
 
 class App extends Component {
@@ -27,38 +33,115 @@ class App extends Component {
     document.title = `Cool Stories Bro`;
   }
 
+  componentDidMount = () => {
+    this.onTravelHomePage();
+  }
+
+  onTravelHomePage = () => {
+    //Fetch and update story cards
+    fetch(`http://localhost:8080/api/stories`)
+    .then(response => response.json())
+    .then(response => {
+      if (response){
+        console.log(response);
+        this.setState({storyInfoArray: response});
+        
+        if (response.length <= 0)
+          this.setState({loadingMessage: "No Stories so far. Click Add Story to create one!"})
+      }
+      
+    })
+    .catch(err => {
+      console.log(err);
+      this.setState({loadingMessage: "Error getting stories"})
+    });
+  }
+
   onRouteChange = (route) => {
-    // if (route === 'home'){
-    //   this.setState(initialState);
-    // } 
-    // else if (route === 'asd'){
-    //   this.setState({isSignedIn : true})
-    // }
+    if (route === 'home'){
+      //this.setState(initialState);
+      this.onTravelHomePage();
+    } 
+    else if (route === 'asd'){
+      //this.setState({isSignedIn : true})
+    }
   
     this.setState({route: route});
   }
 
-  updateStoryReading = (storyImage, storyTitle, storyText) => {
+  logIn = (userID) => {
+    this.setState({signedInUser: userID});
+  }
+
+  logOut = () => {
+    this.setState({signedInUser: 0});
+  }
+
+  updateStoryReading = (storyImage, storyTitle, storyText, storyID) => {
+    this.setState({storyID: storyID});
     this.setState({storyImage: storyImage});
     this.setState({storyTitle: storyTitle});
     this.setState({storyText: storyText});
+
+    fetch(`http://localhost:8080/api/stories/${storyID}/incview`, {
+      method: 'put',
+      headers: {'Content-Type':'application/json'}
+    })
+    .catch(err => console.log(err));
+  }
+
+  downloadStory = (storyID) => {
+    fetch(`http://localhost:8080/api/stories/${storyID}/incdownload`, {
+      method: 'put',
+      headers: {'Content-Type':'application/json'}
+    })
+    .then(response => response.json())
+    .then(response => {
+      if (response)
+        console.log(response);
+    })
+    .catch(err => console.log(err));
+  }
+
+  addStoryButton = () => {
+
+    let routeToChange = 'home';
+    let addStoryButtonText = '+ Add Story';
+    if (this.state.signedInUser === 0){
+      routeToChange = 'sign-in';
+      addStoryButtonText = 'Sign in to add Story';
+    } 
+    else {
+      routeToChange = 'add-story';
+    }
+
+    return <div className='add-story-button'>
+              <Button variant="outline-success" size="md" onClick={() => this.onRouteChange(routeToChange)}>{addStoryButtonText}</Button>
+            </div>
   }
 
   getBody(){
-    const {route} = this.state;
+    const route = this.state.route;
 
     switch (route) {
       case 'home':
-        return <div><Title/> <Storylist onRouteChange={this.onRouteChange} updateStoryReading={this.updateStoryReading}/></div>;
+
+        if (this.state.storyInfoArray.length)
+          return <div><Title/> {this.addStoryButton()} <Storylist onRouteChange={this.onRouteChange} updateStoryReading={this.updateStoryReading} storyInfoArray={this.state.storyInfoArray}/></div>;
+        else
+          return <div><Title/> <h4 className='center'>{this.state.loadingMessage}</h4></div>
         break;
         case 'sign-in':
-        return <div><Title/><SignIn onRouteChange={this.onRouteChange}/></div>;
+        return <div><Title/><SignIn onRouteChange={this.onRouteChange} logIn={this.logIn}/></div>;
         break;
         case 'register':
-        return <div><Title/><Register onRouteChange={this.onRouteChange}/></div>;
+        return <div><Title/><Register onRouteChange={this.onRouteChange} logIn={this.logIn}/></div>;
         break;
         case 'story-reading':
-        return <StoryReading storyImage={this.state.storyImage} storyTitle={this.state.storyTitle} storyText={this.state.storyText}/>;
+        return <StoryReading storyImage={this.state.storyImage} storyTitle={this.state.storyTitle} storyText={this.state.storyText} storyID={this.state.storyID} downloadStory={this.downloadStory}/>;
+        break;
+        case 'add-story':
+        return <AddStory onRouteChange={this.onRouteChange} signedInUser={this.state.signedInUser}/>;
         break;
       default:
         return <div><Title/> <Storylist onRouteChange={this.onRouteChange} updateStoryReading={this.updateStoryReading} /></div>;
@@ -71,7 +154,7 @@ class App extends Component {
       <>
         <div className="App">
           
-          <Header onRouteChange={this.onRouteChange}/>
+          <Header onRouteChange={this.onRouteChange} signedInUser={this.state.signedInUser} logOut={this.logOut}/>
           
           <Container className='contain'>
             {this.getBody()}

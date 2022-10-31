@@ -43,7 +43,7 @@ class Signin extends React.Component {
 
         this.setState({feedbackMessage: "Logging in..."});
 
-        fetch(`https://pure-ravine-89852.herokuapp.com/signin`, {
+        fetch(`http://localhost:8080/api/users/login`, {
             method: 'post',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify({
@@ -51,12 +51,15 @@ class Signin extends React.Component {
                 password: this.state.signInPassword
             })
         })
-            .then(response => response.json())
-            .then(user => {
+            .then(response => {
+                return response.json();
+            })
+            .then(response => {
                 this.setState(initialState);
-
-                if (user.id){         
-                    //this.props.loadUser(user);
+                console.log(response);
+                
+                if (response.userID){         
+                    this.props.logIn(response.userID);
                     this.props.onRouteChange('home');
                 }
                 else {

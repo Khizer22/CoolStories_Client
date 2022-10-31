@@ -50,22 +50,23 @@ class Register extends React.Component{
 
         this.setState({feedbackMessage: "Registering..."});
 
-        fetch('https://pure-ravine-89852.herokuapp.com/register', {
+        fetch('http://localhost:8080/api/users/register', {
             method: 'post',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify({
                 email: this.state.email,
                 password: this.state.password,
                 //name: 'this.state.name'
-                name: 'temp fake name'
             })
         })
-            .then(response => response.json())
-            .then(user => {
+            .then(response => {
+                return response.json();
+            })
+            .then(response => {
                 this.setState(initialState);
 
-                if (user.id){
-                    //this.props.loadUser(user);
+                if (response.userID){
+                    this.props.logIn(response.userID);
                     this.props.onRouteChange('home');
                 }
                 else {
