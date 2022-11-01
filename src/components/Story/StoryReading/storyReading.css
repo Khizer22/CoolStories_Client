@@ -7,16 +7,32 @@
     justify-content:space-between;
 }
 
+.story-text {
+    margin-bottom: 35px;
+    white-space: pre-line;
+}
+
 .downloadingPage {
     padding: 150px;
     background-color: white;
     outline-color: red;
     outline-style: solid;
-    min-height: 1484px;
+    min-height: 1804px;
 }
 
 .outline {
     padding: 10px;
     padding-right: 20px;
     background-color: red;
+}
+
+.chart {
+    margin-top: 25px;
+    max-width: 900px;
+    width: 100%;
+}
+
+.chart-container{
+    display: flex;
+    justify-content: center;
 }

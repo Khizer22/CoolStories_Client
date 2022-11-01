@@ -2,6 +2,7 @@ import React from "react";
 import Image from 'react-bootstrap/Image';
 import Button from 'react-bootstrap/Button';
 import './storyReading.css';
+import Chart from './chart';
 import {exportComponentAsJPEG, exportComponentAsPDF, exportComponentAsPNG} from "react-component-export-image";
 
 class StoryReading extends React.Component {
@@ -9,14 +10,17 @@ class StoryReading extends React.Component {
   constructor(props){
     super(props);
     this.componentRef = React.createRef();
+    this.scrollToRef = React.createRef();
     this.state = {
       currentPage: 0,
       downloadingPage: 0,
-      downloadInProgress: false
+      downloadInProgress: false,
+      chartData: null
     }
     
     // const {storyImage, storyTitle, storyText, storyID, downloadStory} = props;
     this.storyChunk = this.props.storyText.match(/(.|[\r\n]){1,6000}/g);
+    this.viewRateLimit = false;
   }
 
   onCustomClick = (storyID) => {
@@ -27,7 +31,7 @@ class StoryReading extends React.Component {
 
   componentDidUpdate = () => {
     if (this.state.downloadInProgress){
-      exportComponentAsPNG(this.componentRef);
+      exportComponentAsPNG(this.componentRef,{fileName: `${this.props.storyTitle} page ${this.state.downloadingPage}`});
 
       let newPage = this.state.downloadingPage+1;
 
@@ -41,9 +45,14 @@ class StoryReading extends React.Component {
   }
 
   onPageTurn= (pageTurn) => {
-    let newPage = Math.max(0,this.state.currentPage + pageTurn) ;
+    const tempCurrentPage = this.state.currentPage;
+
+    let newPage = Math.max(0,tempCurrentPage + pageTurn) ;
     newPage = Math.min(this.storyChunk.length - 1,newPage);
     this.setState({currentPage: newPage});
+
+    if (newPage != tempCurrentPage)
+      this.scrollToRef.current?.scrollIntoView({behavior: 'auto'});
   }
 
   renderToDownload = () => {
@@ -68,6 +77,32 @@ class StoryReading extends React.Component {
       return <p>{this.storyChunk[this.state.currentPage]}</p>;
   }
 
+  componentDidMount(){
+    this.getDataViews();
+
+    //window.scrollTo(0, 0);
+    this.scrollToRef.current?.scrollIntoView({behavior: 'auto'});
+  }
+
+  getDataViews = () => {
+    if (this.viewRateLimit === false){
+
+      this.viewRateLimit = true;
+
+      fetch(`http://localhost:8080/api/stories/${this.props.storyID}/vd`, {
+        method: 'get',
+        headers: {'Content-Type':'application/json'}
+      })
+      .then(response => response.json())
+      .then(response => {
+        console.log(response);
+        this.viewRateLimit = false;
+        this.setState({chartData:response});
+      }) 
+      .catch(err => console.log(err));
+    }
+  }
+
   render(){
     const {storyImage, storyTitle, storyText, storyID} = this.props;
 
@@ -80,12 +115,18 @@ class StoryReading extends React.Component {
             </div>
           </div>
 
-          <div className='button-right'>
+          <div className='button-right' ref={this.scrollToRef}>
             <Button variant="outline-success" size="md" onClick={() => this.onCustomClick(storyID)}>Download Story</Button>
           </div>
 
-          <h1 className="center storyTitle">{storyTitle}</h1>
-          <div>{this.renderToDownload()}</div>
+          <h1 className="center storyTitle" >{storyTitle}</h1>
+          {this.storyChunk.length > 1 ? 
+            <p className="text-muted">Page: {this.state.currentPage + 1}/{this.storyChunk.length}</p>
+          :
+            <></>
+          }
+          
+          <div className="story-text">{this.renderToDownload()}</div>
 
           {this.storyChunk.length > 1 ? 
             <div className='button-right'>
@@ -93,6 +134,10 @@ class StoryReading extends React.Component {
               <Button  variant="secondary" size="md" onClick={() => this.onPageTurn(1)}>Next Page</Button>
             </div> 
           : <></>}
+
+          <div className="chart-container">
+            <div className='chart'><Chart chartData={this.state.chartData}/></div>
+          </div>
           
       </div>
     );
