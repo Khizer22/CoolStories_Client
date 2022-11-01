@@ -31,7 +31,7 @@ class StoryReading extends React.Component {
 
   componentDidUpdate = () => {
     if (this.state.downloadInProgress){
-      exportComponentAsPNG(this.componentRef,{fileName: `${this.props.storyTitle} page ${this.state.downloadingPage}`});
+      exportComponentAsPNG(this.componentRef,{fileName: `${this.props.storyTitle} page ${this.state.downloadingPage + 1}`});
 
       let newPage = this.state.downloadingPage+1;
 
@@ -134,6 +134,8 @@ class StoryReading extends React.Component {
               <Button  variant="secondary" size="md" onClick={() => this.onPageTurn(1)}>Next Page</Button>
             </div> 
           : <></>}
+
+          <hr style={{'marginTop':'50px'}}/>
 
           <div className="chart-container">
             <div className='chart'><Chart chartData={this.state.chartData}/></div>
