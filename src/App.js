@@ -47,7 +47,7 @@ class App extends Component {
         this.setState({storyInfoArray: response});
         
         if (response.length <= 0)
-          this.setState({loadingMessage: "No Stories so far. Click Add Story to create one!"})
+          this.setState({loadingMessage: "No Stories so far. Sign in to add stories!"})
       }
       
     })
@@ -129,7 +129,7 @@ class App extends Component {
         if (this.state.storyInfoArray.length)
           return <div><Title/> {this.addStoryButton()} <Storylist onRouteChange={this.onRouteChange} updateStoryReading={this.updateStoryReading} storyInfoArray={this.state.storyInfoArray}/></div>;
         else
-          return <div><Title/> <h4 className='center'>{this.state.loadingMessage}</h4></div>
+          return <div><Title/> {this.addStoryButton()}  <h4 className='center'>{this.state.loadingMessage}</h4></div>
         break;
         case 'sign-in':
         return <div><Title/><SignIn onRouteChange={this.onRouteChange} logIn={this.logIn}/></div>;

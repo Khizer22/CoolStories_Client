@@ -4,5 +4,19 @@
 
 .button-right {
     display: flex;
-    justify-content: right;
+    justify-content:space-between;
+}
+
+.downloadingPage {
+    padding: 150px;
+    background-color: white;
+    outline-color: red;
+    outline-style: solid;
+    min-height: 1484px;
+}
+
+.outline {
+    padding: 10px;
+    padding-right: 20px;
+    background-color: red;
 }

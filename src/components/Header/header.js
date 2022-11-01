@@ -13,7 +13,7 @@ function Header({onRouteChange,signedInUser,logOut}) {
           <Container>
             <Navbar.Brand href="#home" onClick={() => onRouteChange('home')}>Cool Stories Bro</Navbar.Brand>
             
-            <Form className="d-flex">
+            {/* <Form className="d-flex">
                 <Form.Control
                 type="search"
                 placeholder="..."
@@ -21,7 +21,7 @@ function Header({onRouteChange,signedInUser,logOut}) {
                 aria-label="Search"
                 />
                 <Button variant="outline-success">Search</Button>
-            </Form>
+            </Form> */}
 
             {signedInUser === 0 ? 
             <Nav>
